@@ -1,2 +1,2 @@
-import Socionics.Psychotypes as Psycho
-import Socionics.Relations as Rel
+from Socionics.Psychotypes import Psychotype
+from Socionics.Relations import Relation

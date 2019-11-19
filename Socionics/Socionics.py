@@ -11,3 +11,6 @@ class Socionics:
     @staticmethod
     def get(name):
         pass
+
+    def __str__(self):
+        return self.__class__.__name__ + ' ' + self.name

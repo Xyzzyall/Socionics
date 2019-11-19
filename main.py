@@ -1,7 +1,6 @@
-from scipy import misc
-import matplotlib.pyplot as plt
+import Socionics as Soc
 
-face = misc.face()
-plt.imshow(face)
-plt.show()
+a = Soc.Relation.get('TO')
+b = Soc.Psychotype.get('Dr')
 
+print(str(a) + ' ' + str(b))

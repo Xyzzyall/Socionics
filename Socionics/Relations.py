@@ -2,7 +2,7 @@ import numpy as np
 import Socionics.Socionics as Soc
 
 
-class Relation(Soc):
+class Relation(Soc.Socionics):
     __data__ = np.empty((8, 8))
 
     def __init__(self, data):
