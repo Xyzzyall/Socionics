@@ -1,13 +1,9 @@
 import numpy as np
-from scipy import optimize as opt
-import scipy as sp
-import random
-import copy
+import Socionics.Socionics as Soc
 
 
-class Relation:
+class Relation(Soc):
     __data__ = np.empty((8, 8))
-    name = ''
 
     def __init__(self, data):
         self.__data__ = np.array(data)
@@ -193,4 +189,6 @@ class Relation:
                 [0, 0, 0, 0, 0, 0, 0, 1]
             ])
         }
-        return relation[name]
+        res = relation[name]
+        res.name = name
+        return res
