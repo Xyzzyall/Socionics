@@ -3,11 +3,6 @@ import Socionics.Socionics as Soc
 
 
 class Psychotype(Soc.Socionics):
-    __data__ = np.empty((8, 8))
-
-    def __init__(self, data):
-        self.__data__ = np.array(data)
-
     @staticmethod
     def get_name(gr, i):
         psychogroups = [
