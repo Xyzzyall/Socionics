@@ -1,5 +1,6 @@
 from Socionics.Psychotypes import Psychotype
 from Socionics.Relations import Relation
+from Socionics.Socionics import Socionics
 
 
 def what_is_this(how_to_interpret, target):
