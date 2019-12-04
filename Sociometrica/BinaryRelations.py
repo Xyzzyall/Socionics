@@ -26,7 +26,7 @@ class BinaryRelations:
 
     def __str__(self):
         names = [str(i + 1) + ': ' + self.__names__[i] for i in range(len(self.__names__))]
-        psychos = [[str(i + 1)] + [elems for elems in self.__data__[i]] for i in range(len(self.__names__))]
+        psychos = [[str(i + 1)] + [str(elems) for elems in self.__data__[i]] for i in range(len(self.__names__))]
 
         res = ''
         for name in names:
@@ -38,7 +38,6 @@ class BinaryRelations:
             for elems in rows:
                 res += elems + '\t'
             res += '\n'
-
         res += '\nReference: {\n' + str(self.reference) + '\n}'
         return res
 
