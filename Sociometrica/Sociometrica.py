@@ -21,6 +21,9 @@ class Sociometrica:
         """Обновить матрицу интертипных отношений"""
         self.__data__ = [[Soc.what_is_this(Soc.Relation, self.__psychotypes__[i].mult(self.__psychotypes__[j])) for j in range(len(self))] for i in range(len(self))]
 
+    def get_raw_data(self):
+        return self.__data__
+
     def add(self, others_name, others_type):
         self.__names__.append(others_name)
         self.__psychotypes__.append(others_type)

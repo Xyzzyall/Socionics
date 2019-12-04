@@ -8,4 +8,6 @@ def what_is_this(how_to_interpret, target):
         obj = how_to_interpret.get(name)
         if obj == target:
             return obj
-    return None
+    new = how_to_interpret(target.__data___)
+    new.name = '?'
+    return new
