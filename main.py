@@ -2,7 +2,8 @@ import Socionics as Soc
 import numpy as np
 import Sociometrica as SM
 
-s = SM.Sociometrica(['Vasya', 'Sanya', 'Ivan', 'Kirill'], ['Np', 'Zhk', 'DK', 'Du'])
+
+s = SM.Sociometrica([str(i+1) for i in range(16)], Soc.Psychotype.get_names())
 grades = SM.Grades({
     'TO': 0, 'DU': 1, 'AK': 1, 'ZE': 0,
     'R-': -1, 'Z-': -1, 'MI': -1, 'DE': 0,
