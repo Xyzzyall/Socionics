@@ -10,6 +10,7 @@ class Collective:
 
     def __iter__(self):
         names = Psychotype.get_names()
+        #todo костыль
         gr = Groups(self.size, len(names))
         for group in gr:
             res = []

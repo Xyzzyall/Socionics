@@ -36,10 +36,10 @@ print(balanced)
 print(dat_balanced)
 print(SM.check_blocks(dat_balanced))
 
-prd = list(BA.Groups(2, 16))
-print(len(prd))
-for pr in prd:
-    print(pr)
+prd = BA.Collective(8)
+
+print(len(list(prd)))
+
 #n = len(br.__data__)
 #dat = br.__data__
 #print(dat)
