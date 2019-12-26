@@ -48,64 +48,56 @@ class Grades:
         return res
 
 
-def balance(M: np.ndarray, u: bool):
-    def define_s_row(row, n):
-        res = []
-        for i in range(n):
-            if row[i] > 0:
-                res.append(i)
-        return res
-
-    def find_index_of_max_len(array):
-        i = 0
-        res = []
-        max_len = 0
-        max_index = 0
-        for elem in array:
-            if len(elem) > max_len:
-                res = elem
-                max_index = i
-            i += 1
-        return max_index, res
-
-    def is_subset(a, b):
-        for a_elem in a:
-            if a_elem not in b:
-                return False
-        return True
-
-    def g_function(s_rows, s_i_star):
-        s_l = []
-        s_l_rev = []
-        for l in range(len(s_rows)):
-            if is_subset(s_rows[l], s_i_star):
-                s_l.append(l)
-            else:
-                s_l_rev.append(l)
-        return s_l, s_l_rev
-
-    D = M.copy()
-    n = len(D)
+def balance(matrix: np.ndarray, u=True):
+    n = len(matrix)
+    d = matrix.copy()
     if u:
         for i in range(n):
-            D[i, i] = 1
-    for i in range(n):
-        for j in range(n):
-            D[i, j] = D[i, j] if D[i, j] > 0 else 0
+            d[i, i] = 1
 
-    DD = D.copy()
+    def pred_sum(matrix, predicate):
+        res = []
+        for row in matrix:
+            num = 0
+            for elem in row:
+                if predicate(elem):
+                    num += elem
+            res.append(num)
+        return np.array(res).transpose()
+
+    def is_subset(x: list, y: list):
+        return set(y).issubset(set(x))
+
+    def find_max(array):
+        ind = 0
+        mx = 0
+        for i in range(len(array)):
+            if array[i] > mx:
+                mx = array[i]
+                ind = i
+        return ind
+
+    def delete_rows(matrix, rows):
+        res = []
+        for i in range(len(matrix)):
+            if not rows[i]:
+                res.append(matrix[i])
+        return np.array(res)
+
+    a = d.copy()
     res = []
-    while True:
-        s_rows = [define_s_row(row, n) for row in DD]
-        max_i, s_i_star = find_index_of_max_len(s_rows)
-        s_l, s_l_rev = g_function(s_rows, s_i_star)
-        DD = DD[s_l_rev, :]
-        res.append(s_l)
-        if len(DD) == 0:
-            flat_res = []
-            for array in res:
-                for elem in array:
-                    flat_res.append(elem)
-            return flat_res
-
+    n = np.array(list(range(n))).transpose()
+    while len(a) > 0:
+        s_list = pred_sum(a, lambda x: x > 0)
+        i_star = find_max(s_list)
+        pos_i_star_row = np.array([(1 if elem > 0 else 0) for elem in a[i_star]])
+        s1 = np.matmul(a, pos_i_star_row.transpose())
+        b = np.array([(1 if s1[i] == s_list[i] else 0) for i in range(len(s1))])
+        #n1 = np.array([n, b])
+        a = delete_rows(a, b)
+        for i in range(len(b)):
+            if b[i]:
+                res.append(n[i])
+        n = delete_rows(n, b)
+    return res
 
