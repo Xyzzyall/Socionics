@@ -1,6 +1,7 @@
 import Socionics as Soc
 import numpy as np
 import Sociometrica as SM
+import BinRelAnalysis as BA
 
 
 s = SM.Sociometrica([str(i+1) for i in range(16)], Soc.Psychotype.get_names())
@@ -34,6 +35,11 @@ dat_balanced = data[np.ix_(balanced, balanced)]
 print(balanced)
 print(dat_balanced)
 print(SM.check_blocks(dat_balanced))
+
+prd = list(BA.Groups(2, 16))
+print(len(prd))
+for pr in prd:
+    print(pr)
 #n = len(br.__data__)
 #dat = br.__data__
 #print(dat)
