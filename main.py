@@ -6,10 +6,10 @@ import BinRelAnalysis as BA
 
 s = SM.Sociometrica([str(i+1) for i in range(16)], Soc.Psychotype.get_names())
 grades = SM.Grades({
-    'TO': 0, 'DU': 1, 'AK': 1, 'ZE': 1,
-    'R-': 1, 'Z-': 1, 'MI': 1, 'DE': 0,
-    'SE': 0, 'PO': 0, 'KT': 0, 'KF': 0,
-    'R+': 0, 'Z+': 0, 'PD': 0, 'RO': -1
+    'TO': 1, 'DU': 1, 'AK': 1, 'ZE': 1,
+    'R-': -1, 'Z-': 1, 'MI': 1, 'DE': 0,
+    'SE': -1, 'PO': 0, 'KT': 0, 'KF': 0,
+    'R+': -1, 'Z+': -1, 'PD': 0, 'RO': -1
 })
 
 br = SM.BinaryRelations.from_sociotypes(s, grades)
@@ -36,9 +36,10 @@ print(balanced)
 print(dat_balanced)
 print(SM.check_blocks(dat_balanced))
 
-prd = BA.Collective(8)
+prd = BA.Collective(4)
 
-print(len(list(prd)))
+ca = BA.Analysis(prd, [grades], 'res.txt')
+ca.analyze()
 
 #n = len(br.__data__)
 #dat = br.__data__
