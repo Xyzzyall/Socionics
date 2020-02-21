@@ -38,7 +38,11 @@ def mysocio_crawler(indexes, sleep=0.1, pattern='https://mysocio.ru/test/tolstik
         html = requests.get(pattern + str(index)).text
         types, wrongs = parse_page(html)
         time.sleep(sleep)
-        yield data_to_line(index, types, wrongs)
+        try:
+            yield data_to_line(index, types, wrongs if wrongs else [])
+        except TypeError:
+            print(html)
+            break
 
 
 def line_to_data(line:str):
