@@ -28,21 +28,26 @@ def parse_page(html):
     return types, wrongs
 
 
-def mysocio_crawler(indexes, sleep=0.1, pattern='https://mysocio.ru/test/tolstikova/result/'):
+def mysocio_crawler(indexes, sleep=0.1, pattern='https://mysocio.ru/test/tolstikova/result/', error_wait=5):
     def data_to_line(ident, soctypes, wrongs):
         return '|'.join([str(ident),
                          '\t'.join(','.join(typ) for typ in soctypes),
                          '\t'.join(wrongs)])
 
     for index in indexes:
-        html = requests.get(pattern + str(index)).text
+        while True:
+            try:
+                html = requests.get(pattern + str(index)).text
+                break
+            except requests.exceptions.RequestException as e:
+                print(e)
+                time.sleep(error_wait)
         types, wrongs = parse_page(html)
         time.sleep(sleep)
         try:
             yield data_to_line(index, types, wrongs if wrongs else [])
         except TypeError:
-            print(html)
-            break
+            print("Something wrong with: " + pattern + str(index))
 
 
 def line_to_data(line: str):

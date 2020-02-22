@@ -10,6 +10,9 @@ class MySocioData:
         self.ind, str_types, self.wrongs = MySocioParser.line_to_data(line)
         self.types = [MySocioData.Sociotype(typ) for typ in str_types]
 
+    def get_max_sociotype(self):
+        return max(self.types)
+
     class Sociotype:
         name = ''
         percentage = 0.0
@@ -20,6 +23,12 @@ class MySocioData:
 
         def __str__(self):
             return ','.join([self.name, str(int(self.percentage*100)) + '%'])
+
+        def __ge__(self, other):
+            return self.percentage >= other.percentage
+
+        def __gt__(self, other):
+            return self.percentage > other.percentage
 
     def __str__(self):
         return '|'.join([
