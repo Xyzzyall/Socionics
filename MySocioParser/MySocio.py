@@ -47,4 +47,4 @@ def mysocio_crawler(indexes, sleep=0.1, pattern='https://mysocio.ru/test/tolstik
 
 def line_to_data(line: str):
     ind, types, wrongs = line.split('|')
-    return int(ind), [tuple(typ.split(',')) for typ in types.split('\t')], wrongs.split('\t')
+    return int(ind), [tuple(typ.split(',')) for typ in types.split('\t')], wrongs.replace('\n', '').split('\t')
