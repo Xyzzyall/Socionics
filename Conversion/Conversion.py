@@ -14,6 +14,7 @@ class ConversionPsychotype(Soc.Psychotype):
                 if mtx[i, j] == 1:
                     mtx[i, j-4] = 1
         for i in range(4):
+
             for j in range(4):
                 new_mtx[i, j] = mtx[i, j]
         for i in range(4, 8):
