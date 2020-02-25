@@ -1,4 +1,4 @@
-#!"C:\Users\Александр\OneDrive\Для учебы\2019-2020\Куренков\kurs\venv\Scripts\python.exe" -x
+#!D:\Python\Diplom\venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'pip==19.0.3','console_scripts','pip'
 __requires__ = 'pip==19.0.3'
 import re

@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Александр\OneDrive\Для учебы\2019-2020\Куренков\kurs\venv"
+VIRTUAL_ENV="D:\Python\Diplom\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
