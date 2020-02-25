@@ -30,17 +30,6 @@ class Socionics:
         res.name = self.name + '*' + other.name + "'"
         return res
 
-    def decompose(self):
-        """
-            ВАЖНО: считается, что все компоненты матрицы данных ровно распределены по базисам социотипа/отношений
-        :return:
-            процент "содержания" каждого социотипа/отношения в объекте
-        """
-        res = {}
-        for name in self.get_names():
-            res[name] = max(max(self.get(name) * self.__data__))
-        return res
-
     def __eq__(self, other):
         COMP_ERROR = 0.0000001
         if sum(sum(abs(self.__data__ - other.__data__))) < COMP_ERROR:
