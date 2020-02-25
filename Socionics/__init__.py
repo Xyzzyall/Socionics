@@ -1,7 +1,7 @@
 from Socionics.Psychotypes import Psychotype
 from Socionics.Relations import Relation
 from Socionics.Socionics import Socionics
-
+import numpy as np
 
 def what_is_this(how_to_interpret, target):
     for name in how_to_interpret.get_names():
@@ -21,5 +21,6 @@ def decompose(how_to_interpret, target):
     """
     res = {}
     for name in how_to_interpret.get_names():
-        res[name] = max(max(how_to_interpret.get(name) * target.__data__))
+        res[name] = np.max(how_to_interpret.get(name).__data__ * target.__data__)
+    print(res)
     return res
