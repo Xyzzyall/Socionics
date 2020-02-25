@@ -22,5 +22,4 @@ def decompose(how_to_interpret, target):
     res = {}
     for name in how_to_interpret.get_names():
         res[name] = np.max(how_to_interpret.get(name).__data__ * target.__data__)
-    print(res)
     return res
