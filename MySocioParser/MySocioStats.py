@@ -2,10 +2,12 @@ from matplotlib import pyplot as plt
 from collections import defaultdict
 import MySocioParser as parser
 import random
+import Socionics as soc
+import numpy as np
 
 
 class MySocioStats:
-    class Stats:
+    class SimpleStats:
         statistics = defaultdict(float)
         wrongs_stat = defaultdict(int)
         accounts = 0
@@ -31,27 +33,86 @@ class MySocioStats:
             return 'There are ' + str(self.accounts) + ' accounts.\nTypes: ' + \
                    str(self.statistics) + '\nWrongs: ' + str(self.wrongs_stat)
 
+    class RelationsStats:
+        statistics = defaultdict(float)
+        __num__ = 0
+
+        def add_data(self, data: parser.MySocioData):
+            typ = parser.Utils.get_my_sociotype(data)
+            #for name in soc.Psychotype.get_names():
+            #    self.add_to_stat(soc.Psychotype.get(name).mult(typ))
+            self.add_to_stat(soc.Psychotype.get('Gs').mult(typ))
+            self.__num__ += 1
+
+        def add_to_stat(self, relation: soc.Relation):
+            decomposed = soc.decompose(soc.Relation, relation)
+            for key in decomposed.keys():
+                self.statistics[key] += decomposed[key]
+
+        def normalize(self):
+            """"""
+            """mx = max(self.statistics.values())
+            mn = min(self.statistics.values())
+            for key in self.statistics.keys():
+                val = self.statistics[key]
+                self.statistics[key] = (val - mn) / (mx - mn)"""
+            mx = max(self.statistics.values())
+            for key in self.statistics.keys():
+                val = self.statistics[key]
+                self.statistics[key] = val / mx
+
+        def __str__(self):
+            return str(self.statistics)
+
+    class AccuracyStat:
+        statistics = {name: [float(), int()] for name in soc.Psychotype.get_names()}
+
+        def add_data(self, data: parser.MySocioData):
+            for typ in data.types:
+                val = self.statistics[parser.Utils.mysocio_type_convert(typ.name)]
+                val[0] += typ.percentage
+                val[1] += 1
+
+        def normalize(self):
+            for key in self.statistics.keys():
+                val = self.statistics[key]
+                val[0] = val[0]/val[1] * 100.0
+
+        def get_values(self):
+            return [val[0] for val in self.statistics.values()]
+
+
     all_stats = None
     stats_random_300 = None
     stats_just_max_type = None
+    stats_relations = None
+    stats_accuracy = None
 
     def __init__(self, file: str):
-        self.all_stats, self.stats_random_300, self.stats_just_max_type = MySocioStats.Stats(), MySocioStats.Stats(), MySocioStats.Stats()
+        self.all_stats, self.stats_random_300, self.stats_just_max_type = MySocioStats.SimpleStats(), MySocioStats.SimpleStats(), MySocioStats.SimpleStats()
+        self.stats_relations = MySocioStats.RelationsStats()
+        self.stats_accuracy = MySocioStats.AccuracyStat()
         f = open(file, 'r')
         for line in f:
             data = parser.MySocioData(line)
             self.all_stats.add_data(data)
             data.types = [data.get_max_sociotype()]
             self.stats_just_max_type.add_data(data)
-
+            self.stats_relations.add_data(data)
+            self.stats_accuracy.add_data(data)
+        self.stats_accuracy.normalize()
         self.all_stats.normalize()
         self.stats_just_max_type.normalize()
         f.close()
+
         f = open(file, 'r')
         for line in f:
             if random.randint(0, self.all_stats.accounts) <= 300:
-                self.stats_random_300.add_data(parser.MySocioData(line))
+                data = parser.MySocioData(line)
+                self.stats_random_300.add_data(data)
+
         self.stats_random_300.normalize()
+        #self.stats_relations.normalize()
         f.close()
 
     def show_plot(self):
@@ -88,9 +149,19 @@ class MySocioStats:
         draw_wrongs(axs[1][1], self.all_stats)
         fig.suptitle('~300 cлучайных записей.\n' + str(self.stats_random_300.accounts) + ' записей.')
 
+        plt.figure(3)
+        fig, axs = plt.subplots(1, 1, figsize=(9, 3))
+        axs.bar(self.stats_accuracy.statistics.keys(), self.stats_accuracy.get_values())
+        axs.set_title('Диаграмма точности определения признаков.')
+
+        plt.figure(4)
+        fig, axs = plt.subplots(1, 1, figsize=(9, 3))
+        draw_stats(axs, self.stats_relations)
+        axs.set_title('Диаграмма распределения отношений.')
+        axs.set_xlabel('Вероятностей')
+        fig.suptitle('Отношения.')
+
         plt.show()
 
-
     def __str__(self):
-        return 'All: ' + str(self.all_stats) + '\nRandom ~200: '
-
+        return 'All: ' + str(self.all_stats) + '\nRandom ~300: ' + str(self.stats_random_300)
