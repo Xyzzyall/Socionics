@@ -12,6 +12,11 @@ class MySocioStats:
         wrongs_stat = defaultdict(int)
         accounts = 0
 
+        def __init__(self):
+            self.statistics = defaultdict(float)
+            self.wrongs_stat = defaultdict(int)
+            self.accounts = 0
+
         def add_data(self, data: parser.MySocioData):
             for typ in data.types:
                 self.statistics[typ.name] += typ.percentage
@@ -81,7 +86,6 @@ class MySocioStats:
         def get_values(self):
             return [val[0] for val in self.statistics.values()]
 
-
     all_stats = None
     stats_random_300 = None
     stats_just_max_type = None
@@ -89,7 +93,9 @@ class MySocioStats:
     stats_accuracy = None
 
     def __init__(self, file: str):
-        self.all_stats, self.stats_random_300, self.stats_just_max_type = MySocioStats.SimpleStats(), MySocioStats.SimpleStats(), MySocioStats.SimpleStats()
+        self.all_stats = MySocioStats.SimpleStats()
+        self.stats_random_300 = MySocioStats.SimpleStats()
+        self.stats_just_max_type = MySocioStats.SimpleStats()
         self.stats_relations = MySocioStats.RelationsStats()
         self.stats_accuracy = MySocioStats.AccuracyStat()
         f = open(file, 'r')
@@ -116,9 +122,16 @@ class MySocioStats:
         f.close()
 
     def show_plot(self):
+        def rename_types(stats: dict):
+            new = {}
+            for key in parser.Utils.psycho_map.keys():
+                new[parser.Utils.psycho_map[key]] = stats[key.capitalize()]
+            return new
+
         def draw_stats(axis, stats):
-            axis.barh(range(16), stats.statistics.values(), align='center')
-            axis.set_yticks(range(16))
+            ln = len(stats.statistics.keys())
+            axis.barh(range(ln), stats.statistics.values(), align='center')
+            axis.set_yticks(range(ln))
             axis.set_yticklabels(list(stats.statistics.keys()))
             axis.invert_yaxis()
             axis.set_xlabel('Вероятностей/записей')
@@ -128,6 +141,11 @@ class MySocioStats:
             axis.bar(stats.wrongs_stat.keys(), stats.wrongs_stat.values())
             axis.set_title('Диаграмма "недостоверных" признаков.')
 
+        self.all_stats.statistics = rename_types(self.all_stats.statistics)
+        self.stats_just_max_type.statistics = rename_types(self.stats_just_max_type.statistics)
+        self.stats_random_300.statistics = rename_types(self.stats_random_300.statistics)
+        #self.stats_accuracy.statistics = rename_types(self.stats_accuracy.statistics)
+
         plt.figure(0)
         fig, axs = plt.subplots(1, 2, figsize=(9, 3))
         draw_stats(axs[0], self.all_stats)
@@ -135,18 +153,18 @@ class MySocioStats:
         fig.suptitle('Статистика сайта MySocio.ru\n' + str(self.all_stats.accounts) + ' записей.')
 
         plt.figure(1)
-        fig, axs = plt.subplots(1, 2, figsize=(9, 3))
+        fig, axs = plt.subplots(2, 1, figsize=(9, 3))
         draw_stats(axs[0], self.stats_just_max_type)
         draw_stats(axs[1], self.all_stats)
         axs[1].set_title('Диаграмма с учетом всех вероятностей.')
         fig.suptitle('Статистика наиболее вероятных типов\n' + str(self.stats_just_max_type.accounts) + ' записей.')
 
         plt.figure(2)
-        fig, axs = plt.subplots(2, 2, figsize=(9, 3))
-        draw_stats(axs[0][0], self.stats_random_300)
-        draw_wrongs(axs[0][1], self.stats_random_300)
-        draw_stats(axs[1][0], self.all_stats)
-        draw_wrongs(axs[1][1], self.all_stats)
+        fig, axs = plt.subplots(2, 1, figsize=(9, 3), sharex=True)
+        draw_stats(axs[0], self.stats_random_300)
+        #draw_wrongs(axs[0][1], self.stats_random_300)
+        draw_stats(axs[1], self.all_stats)
+        #draw_wrongs(axs[1][1], self.all_stats)
         fig.suptitle('~300 cлучайных записей.\n' + str(self.stats_random_300.accounts) + ' записей.')
 
         plt.figure(3)
@@ -160,6 +178,27 @@ class MySocioStats:
         axs.set_title('Диаграмма распределения отношений.')
         axs.set_xlabel('Вероятностей')
         fig.suptitle('Отношения.')
+
+        diff_stats = MySocioStats.SimpleStats()
+        diff_stats.statistics = {key: self.all_stats.statistics[key] - self.stats_just_max_type.statistics[key] for key in self.all_stats.statistics}
+        mx = max(diff_stats.statistics.values())
+        mn = min(diff_stats.statistics.values())
+        for key in diff_stats.statistics:
+            val = diff_stats.statistics[key]
+            diff_stats.statistics[key] = (val - mn) / (mx - mn)
+        plt.figure(5)
+        fig, axs = plt.subplots(1, 1, figsize=(9, 3))
+        draw_stats(axs, diff_stats)
+        fig.suptitle('Разница наиболее вероятных типов и всех типов.\n' + str(self.stats_just_max_type.accounts) + ' записей.')
+
+        random_diff = MySocioStats.SimpleStats()
+        random_diff.statistics = {key: abs(self.stats_random_300.statistics[key] - self.all_stats.statistics[key]) for key
+                                 in self.all_stats.statistics}
+        random_diff.statistics['min'] = min(list(self.all_stats.statistics.values()))
+        plt.figure(6)
+        fig, axs = plt.subplots(1, 1, figsize=(9, 3))
+        draw_stats(axs, random_diff)
+        fig.suptitle('Разница 300 и общей статистики.\n' + str(self.stats_just_max_type.accounts) + ' записей.')
 
         plt.show()
 
