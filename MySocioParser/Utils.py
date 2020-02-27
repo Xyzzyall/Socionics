@@ -2,31 +2,31 @@ import Socionics as soc
 import MySocioParser as parser
 import numpy as np
 
+psycho_map = {
+    'искатель': 'DK',
+    'посредник': 'Du',
+    'энтузиаст': 'Gu',
+    'аналитик': 'Rb',
+
+    'инспектор': 'Mk',
+    'наставник': 'Gm',
+    'лирик': 'Es',
+    'маршал': 'Zhk',
+
+    'политик': 'Np',
+    'критик': 'Ba',
+    'предприниматель': 'Dzh',
+    'хранитель': 'Dr',
+
+    'гуманист': 'Ds',
+    'администратор': 'Sht',
+    'мастер': 'Gb',
+    'советчик': 'Gs'
+}
+
 
 def mysocio_type_convert(name: str):
-    map = {
-        'искатель': 'DK',
-        'посредник': 'Du',
-        'энтузиаст': 'Gu',
-        'аналитик': 'Rb',
-
-        'наставник': 'Mk',
-        'инспектор': 'Gm',
-        'маршал': 'Es',
-        'лирик': 'Zhk',
-
-        'политик': 'Np',
-        'критик': 'Ba',
-        'предприниматель': 'Dzh',
-        'хранитель': 'Dr',
-
-        'администратор': 'Ds',
-        'гуманист': 'Sht',
-        'советчик': 'Gb',
-        'мастер': 'Gs'
-    }
-
-    return map[name.lower()]
+    return psycho_map[name.lower()]
 
 
 def get_my_sociotype(data: parser.MySocioData):
