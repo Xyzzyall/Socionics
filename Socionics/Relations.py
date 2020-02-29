@@ -15,7 +15,7 @@ class Relation(Soc.Socionics):
 
     @staticmethod
     def get_names():
-        return ['TO', 'DU', 'AK', 'ZE', 'R-', 'Z-', 'MI', 'DE', 'SE', 'PO', 'KT', 'KF','R+', 'Z+', 'PD', 'RO']
+        return ['TO', 'DU', 'AK', 'ZE', 'R-', 'Z-', 'MI', 'DE', 'SE', 'PO', 'KT', 'KF', 'R+', 'Z+', 'PD', 'RO']
 
     @staticmethod
     def get(name):

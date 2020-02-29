@@ -7,6 +7,7 @@ class Socionics:
 
     def __init__(self, data):
         self.__data__ = np.array(data)
+        self.name = 'unknown'
 
     @staticmethod
     def get_name(gr, i):
@@ -18,6 +19,10 @@ class Socionics:
 
     @staticmethod
     def get(name):
+        pass
+
+    @staticmethod
+    def get_zero():
         pass
 
     def mult(self, other):

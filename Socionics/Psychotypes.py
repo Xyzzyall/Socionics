@@ -189,3 +189,6 @@ class Psychotype(Soc.Socionics):
         res.name = name
         return psychotype[name]
 
+    @staticmethod
+    def get_zero():
+        return Psychotype(np.zeros((8, 8)))
