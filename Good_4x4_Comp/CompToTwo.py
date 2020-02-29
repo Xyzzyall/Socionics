@@ -42,18 +42,18 @@ class CompToTwo(Soc.Psychotype):
                     t2 = o in change
                     t3 = p in change
                     t4 = l in change
-                    if t1 and t2 and t3 and t4:
+                    if t1 and t2 and t3 and t4 and k <= 54:
                         mtxRes[0][0] = cases(u)
                         mtxRes[0][1] = cases(o)
                         mtxRes[1][0] = cases(p)
                         mtxRes[1][1] = cases(l)
                         mas.append(k)
-                        mas.append(i)
-                        mas.append(j)
+                        #mas.append(i)
+                        #mas.append(j)
                         dic[ik] = mtxRes
                         ik = ik + 1
                         #print(mtxRes)
-                        #raise Exception()
+                        raise Exception()
                     k += 1
                 mtx = mtx.transpose()
                 #print(mtx)
