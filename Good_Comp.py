@@ -27,10 +27,10 @@ pType = Soc.Psychotype.get_names()
 
 dic = {}
 dict2 = {}
-for i in range(16):
-    print(pType[i])
-    mtxA, mas, dic[i] = Comp.CompToTwo.get(pType[i])
-    print(dic[i])
+# for i in range(2):
+#     print(pType[i])
+#     mtxA, mas, dic[i] = Comp.CompToTwo.get(pType[i])
+#     print(dic[i])
 
 # count = 0
 # for i in range(16):
@@ -41,8 +41,34 @@ for i in range(16):
 #             print(pType[i], j)
 # print(count/(j+1))
 
-print(dic[0][0] in dic[0][2])
+#print(dic[0][0] in dic[0][2])
+
+case = {}
+compare = []
+a, b, _ = Comp.CompToTwo.get('Gu')
+c, d, _ = Comp.CompToTwo.get('Gm')
+# print(a)
+# print(b)
+# print(c)
+# print(d)
 
 for i in range(16):
-    dict2[i] = set(dic[i])
-print(dict2)
+    mtx, mas, _ = Comp.CompToTwo.get(pType[i])
+    if mas == [50] :
+        case[pType[i]] = mtx
+        compare.append(mtx)
+    #print(mas)
+print(case)
+print(compare)
+
+file = open('compare.txt', 'w')
+compare = str(compare)
+for i in compare:
+    file.write(i)
+l = []
+file.close()
+f = open('compare.txt')
+for i in f:
+    l.append(f.read())
+f.close()
+print(l)
