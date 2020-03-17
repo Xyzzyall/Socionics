@@ -2,48 +2,65 @@ import Socionics as Soc
 import numpy as np
 import Sociometrica as SM
 import BinRelAnalysis as BA
+import itertools
+import time
+from threading import Thread
 
 
-s = SM.Sociometrica([str(i+1) for i in range(16)], Soc.Psychotype.get_names())
-grades = SM.Grades({
-    'TO': 1, 'DU': 1, 'AK': 1, 'ZE': 1,
-    'R-': -1, 'Z-': 1, 'MI': 1, 'DE': 0,
-    'SE': -1, 'PO': 0, 'KT': 0, 'KF': 0,
-    'R+': -1, 'Z+': -1, 'PD': 0, 'RO': -1
-})
+class Daemon(Thread):
+    threads_in_work = 0
+    threads = 0
+    collect = 0
 
-br = SM.BinaryRelations.from_sociotypes(s, grades)
-print(br)
-print(grades)
+    def __init__(self, threads: int, collect: int):
+        Thread.__init__(self)
+        self.threads = threads
+        self.collect = collect
 
-test = np.array([
-    [0,  1,  0,  0,  1,  1,  0, -1,  1,  1],
-    [1,  0,  1,  1,  1,  1, -1, -1,  0,  1],
-    [0,  1,  0,  0,  1,  1, -1,  0,  1,  1],
-    [0,  1,  0,  0,  1,  1, -1,  0,  1,  1],
-    [1,  1,  1,  1,  0,  0,  0,  0,  0,  0],
-    [1,  1,  1,  1,  0,  0, -1,  0,  0,  1],
-    [-1,  0,  0,  0,  0,  0,  0,  1,  0, -1],
-    [-1, -1,  0,  0,  0, -1,  1,  0, -1, -1],
-    [1,  0,  1,  1,  1,  0,  0,  0,  0,  0],
-    [1,  1,  1,  1,  0,  1,  0, -1,  0,  0]
-]) + np.eye(10,10)
+    def thread_generator(self):
+        for p in itertools.product([1, 0, -1], repeat=6):
+            grades = SM.Grades({
+                'TO': 1, 'DU': 1, 'AK': 1, 'ZE': 1,
+                'R-': -1, 'Z-': 0, 'MI': p[0], 'DE': 0,
+                'SE': p[1], 'PO': p[2], 'KT': 0, 'KF': -1,
+                'R+': -1, 'Z+': p[3], 'PD': p[4], 'RO': p[5]
+            })
+            yield GradeAnalysisThread(grades, self.collect, self)
 
-data = br.__data__
-balanced = SM.balance(data, u=False)
-dat_balanced = data[np.ix_(balanced, balanced)]
-print(balanced)
-print(dat_balanced)
-print(SM.check_blocks(dat_balanced))
+    def thread_started(self):
+        self.threads_in_work += 1
 
-prd = BA.Collective(4)
+    def thread_finished(self):
+        self.threads_in_work -= 1
 
-ca = BA.Analysis(prd, [grades], 'res.txt')
-ca.analyze()
+    def run(self):
+        g = self.thread_generator()
+        try:
+            while True:
+                if self.threads_in_work < self.threads:
+                    next(g).start()
+                time.sleep(0.001)
+        except StopIteration:
+            print('finished')
 
-#n = len(br.__data__)
-#dat = br.__data__
-#print(dat)
-#dat = test.copy()
-#n = len(dat)
-#dat_balanced = dat[np.ix_(balanced, balanced)]#dat[balanced].transpose()[balanced].transpose()
+
+class GradeAnalysisThread(Thread):
+    grade = None
+    ca = None
+    daemon = None
+
+    def __init__(self, grade: SM.Grades, collect: int, daemon: Daemon):
+        Thread.__init__(self)
+        self.grade = grade
+        self.daemon = daemon
+        self.ca = BA.Analysis(BA.Collective(collect), self.grade, 'TestData/res.txt')
+
+    def run(self):
+        self.daemon.thread_started()
+        self.ca.analyze()
+        self.daemon.thread_finished()
+
+
+d = Daemon(6, 4)
+d.run()
+

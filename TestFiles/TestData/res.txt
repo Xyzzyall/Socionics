@@ -1,6 +1,4 @@
 {'collective': 4, 'grades': [<Sociometrica.SocionicsGrades.Grades object at 0x07168A10>]}(0, {'balanced':1632, '1 block':560, '2 blocks':1072, '3 blocks':204, 'non balanced':2040}
-{'collective': 2, 'grades': 'TO:1.0; DU:1.0; AK:1.0; ZE:1.0; R-:-1.0; Z-:1.0; MI:1.0; DE:0.0; SE:-1.0; PO:0.0; KT:0.0; KF:0.0; R+:-1.0; Z+:-1.0; PD:0.0; RO:-1.0; ', 'balanced:'120, '1 block:'88, '2 blocks:'32, '3 blocks:'0, 'non balanced:'16}
-{'collective': 2, 'grades': 'TO:1.0; DU:1.0; AK:1.0; ZE:1.0; R-:-1.0; Z-:1.0; MI:1.0; DE:0.0; SE:-1.0; PO:0.0; KT:0.0; KF:0.0; R+:-1.0; Z+:-1.0; PD:0.0; RO:-1.0; ', 'balanced':120, '1 block':88, '2 blocks':32, '3 blocks':0, 'non balanced':16}
-{'collective': 2, 'grades': 'TO:1.0; DU:1.0; AK:1.0; ZE:1.0; R-:-1.0; Z-:1.0; MI:1.0; DE:0.0; SE:-1.0; PO:0.0; KT:0.0; KF:0.0; R+:-1.0; Z+:-1.0; PD:0.0; RO:-1.0; ', 'balanced':120, '1 block':88, '2 blocks':32, '3 blocks':0, 'non balanced':16}
-{'collective': 2, 'grades': 'TO:1.0; DU:1.0; AK:1.0; ZE:1.0; R-:-1.0; Z-:1.0; MI:1.0; DE:0.0; SE:-1.0; PO:0.0; KT:0.0; KF:0.0; R+:-1.0; Z+:-1.0; PD:0.0; RO:-1.0; ', 'balanced':120, '1 block':88, '2 blocks':32, '3 blocks':0, 'non balanced':16}
-{'collective': 2, 'grades': 'TO:1.0; DU:1.0; AK:1.0; ZE:1.0; R-:-1.0; Z-:1.0; MI:1.0; DE:0.0; SE:-1.0; PO:0.0; KT:0.0; KF:0.0; R+:-1.0; Z+:-1.0; PD:0.0; RO:-1.0; ', 'balanced':120, '1 block':88, '2 blocks':32, '3 blocks':0, 'non balanced':16}
+
+
+
