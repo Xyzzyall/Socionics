@@ -13,11 +13,10 @@ class Analysis:
 
     def analyze(self):
         iterations = 0
-        out = open(self.output_file, 'w')
-        out.write("{'collective': " + str(self.collective.size) + ", 'grades': " + str(self.grades) + "}")
+        out = open(self.output_file, 'a')
         grade_i = 0
         for grade in self.grades:
-            res = '(' + str(grade_i) + ', {'
+            out.write("\n{'collective': " + str(self.collective.size) + ", 'grades': '" + str(grade) + "'")
             coll_an = BA.CollectiveAnalysis(self.collective, grade)
             balanced_1b = 0
             balanced_2b = 0
@@ -40,9 +39,8 @@ class Analysis:
                 if iterations % 100 == 0:
                     print(str(iterations) + ' is done.')
             balanced = balanced_1b + balanced_2b
-            res += "'balanced:'" + str(balanced) + ", '1 block:'" + str(balanced_1b) + ", '2 blocks:'" + \
-                   str(balanced_2b) + ", '3 blocks:'" + str(balanced_3b) + ", 'non balanced:'" + str(non_balanced) + "}"
-            out.write(res)
+            out.write(", 'balanced':" + str(balanced) + ", '1 block':" + str(balanced_1b) + ", '2 blocks':" + \
+                   str(balanced_2b) + ", '3 blocks':" + str(balanced_3b) + ", 'non balanced':" + str(non_balanced) + "}")
             grade_i += 1
             print('Grade ' + str(grade_i) + ' analyzed.')
         out.close()
