@@ -104,7 +104,7 @@ class MySocioStats:
             self.all_stats.add_data(data)
             data.types = [data.get_max_sociotype()]
             self.stats_just_max_type.add_data(data)
-            self.stats_relations.add_data(data)
+            #self.stats_relations.add_data(data)
             self.stats_accuracy.add_data(data)
         self.stats_accuracy.normalize()
         self.all_stats.normalize()
