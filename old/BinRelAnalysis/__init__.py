@@ -1,0 +1,1 @@
+from old.BinRelAnalysis.CollectiveAnalysis import CollectiveAnalysis
