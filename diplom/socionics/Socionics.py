@@ -21,7 +21,7 @@ class Psychotype:
         return ['DK', 'Du', 'Gu', 'Rb', 'Mk', 'Gm', 'Es', 'Zhk', 'Np', 'Ba', 'Dzh', 'Dr', 'Ds', 'Sht', 'Gb', 'Gs']
 
     @staticmethod
-    def get_by_name(name):
+    def get_by_name(name: str):
         names = {
             'DK': 1,
             'Du': 2,
@@ -47,4 +47,48 @@ class Psychotype:
 
 
 class Relation:
-    pass
+    relation = 0
+    name = ''
+
+    def __init__(self, relation, name):
+        self.relation = relation
+        self.name = name
+
+    @staticmethod
+    def get_name(gr, i):
+        relgroups = [
+            ['TO', 'DU', 'AK', 'ZE'],
+            ['R-', 'Z-', 'MI', 'DE'],
+            ['SE', 'PO', 'KT', 'KF'],
+            ['R+', 'Z+', 'PD', 'RO']
+        ]
+        return relgroups[gr][i]
+
+    @staticmethod
+    def get_names():
+        return ['TO', 'DU', 'AK', 'ZE', 'R-', 'Z-', 'MI', 'DE', 'SE', 'PO', 'KT', 'KF', 'R+', 'Z+', 'PD', 'RO']
+
+    @staticmethod
+    def get_by_name(name):
+        relation = {
+            'TO': 1,
+            'DU': 2,
+            'AK': 3,
+            'ZE': 4,
+
+            'R-': 5,
+            'Z-': 6,
+            'MI': 7,
+            'DE': 8,
+
+            'SE': 9,
+            'PO': 10,
+            'KT': 11,
+            'KF': 12,
+
+            'R+': 13,
+            'Z+': 14,
+            'PD': 15,
+            'RO': 16
+        }
+        return Relation(relation[name], name)
