@@ -2,7 +2,7 @@ import numpy as np
 from old.Socionics import Socionics as Soc
 
 
-class Psychotype(Soc.Socionics):
+class Psychotype(Soc):
     @staticmethod
     def get_name(gr, i):
         psychogroups = [

@@ -1,7 +1,7 @@
 from old.Socionics import Socionics as Soc
 
 
-class Relation(Soc.Socionics):
+class Relation(Soc):
     @staticmethod
     def get_name(gr, i):
         relgroups = [
