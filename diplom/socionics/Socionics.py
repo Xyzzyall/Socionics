@@ -45,6 +45,9 @@ class Psychotype:
         }
         return Psychotype(names[name], name)
 
+    def __getitem__(self, item: str):
+        return self.get_by_name(item)
+
 
 class Relation:
     relation = 0

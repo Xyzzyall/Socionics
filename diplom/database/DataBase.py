@@ -8,12 +8,14 @@ class Request:
     request = str
     response = callable
 
-    def __init__(self, request: str, response_wrapper: callable):
+    def __init__(self, request: str, response_wrapper: callable = None):
         self.request = request
         self.response = response_wrapper
 
     def execute(self, cursor: sqlite.Cursor):
-        pass
+        cursor.execute(self.request)
+        if self.response:
+            self.response(cursor.fetchall())
 
 
 class DataBase(Thread):

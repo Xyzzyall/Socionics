@@ -1,5 +1,5 @@
 from old.Sociometrica import Sociometrica
-from old.Sociometrica import Grades
+from old.Sociometrica.SocionicsGrades import Grades
 import numpy as np
 
 
