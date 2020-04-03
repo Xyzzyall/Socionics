@@ -15,12 +15,29 @@ class Request:
         self._source_thread_name = current_thread().name
 
     def execute(self, cursor: sqlite.Cursor):
-        cursor.execute(self.request)
+        for request in self.request.split(';'):
+            cursor.execute(request)
         if self.response:
             self.response(cursor.fetchall())
 
     def __str__(self):
         return f'Request from "{self._source_thread_name}". Code:\n' + self.request
+
+
+class RequestMany(Request):
+    values = list
+
+    def __init__(self, request: str, values: list, response_wrapper: callable = None):
+        Request.__init__(self, request, response_wrapper)
+        self.values = values
+
+    def execute(self, cursor: sqlite.Cursor):
+        cursor.executemany(self.request, self.values)
+        if self.response:
+            self.response(cursor.fetchall())
+
+    def __str__(self):
+        return f'Request from "{self._source_thread_name}". Code:\n' + self.request + '\nValues:\n' + str(self.values)
 
 
 class DataBase(Thread):
@@ -31,7 +48,11 @@ class DataBase(Thread):
     cursor = sqlite.Cursor
     connection = sqlite.Connection
     queue = dict
+    to_sign_up = list
     to_sign_out = list
+
+    _db_file = str
+    _tables_req = str
 
     _is_working = bool
 
@@ -39,35 +60,38 @@ class DataBase(Thread):
         Thread.__init__(self, name='DataBase')
         self.queue = {}
         self.to_sign_out = []
+        self.to_sign_up = []
         self._is_working = False
-        try:
-            with open(db_file, 'r'):
-                self.connection = sqlite.connect(db_file)
-                self.cursor = self.connection.cursor()
-        except FileNotFoundError:
-            self.connection = sqlite.connect(db_file)
-            self.cursor = self.connection.cursor()
-            self.cursor.execute(create_tables_request)
-            self.connection.commit()
+        self._db_file = db_file
+        self._tables_req = create_tables_request
 
     def sign_up_thread(self):
-        assert current_thread() not in self.queue.keys, "Thread already signed"
-        self.queue[current_thread()] = []
+        assert (current_thread() not in self.queue), "Thread already signed"
+        self.to_sign_up.append(current_thread())
 
     def sign_out_thread(self):
         self.to_sign_out.append(current_thread())
-        # del self.queue[current_thread()]
+
+    def _sign_up_threads(self):
+        while len(self.to_sign_up) > 0:
+            thread = self.to_sign_up.pop()
+            self.queue[thread] = []
+            print(str(thread) + ' is signed up.')
 
     def _sign_out_threads(self):
-        empty = []
-        for thread in self.to_sign_out:
-            if len(self.queue[thread]) == 0:
+        skipped = 0
+        while len(self.to_sign_out) > skipped:
+            thread = self.to_sign_out.pop()
+            if len(self.queue[thread]) > 0:
+                self.to_sign_out.append(thread)
+                skipped += 1
+            else:
                 del self.queue[thread]
-                empty.append(thread)
-        for thread in empty:
-            self.to_sign_out.remove(thread)
+                print(str(thread) + ' is signed out.')
 
     def append_request(self, request: Request):
+        while (current_thread() not in self.queue) and (current_thread() in self.to_sign_up):
+            time.sleep(0.01)
         self.queue[current_thread()].append(request)
 
     def close(self):
@@ -79,13 +103,25 @@ class DataBase(Thread):
                 req = self.queue[key].pop()
                 try:
                     req.execute(self.cursor)
-                except sqlite.Error:
+                except sqlite.DatabaseError:
                     print('Something wrong with request: ' + str(req))
 
     def run(self) -> None:
+        try:
+            with open(self._db_file, 'r'):
+                self.connection = sqlite.connect(self._db_file)
+                self.cursor = self.connection.cursor()
+        except FileNotFoundError:
+            self.connection = sqlite.connect(self._db_file)
+            self.cursor = self.connection.cursor()
+            for req in self._tables_req.split(';'):
+                self.cursor.execute(req)
+            self.connection.commit()
+
         self._is_working = True
         tick_timer = 0
         while self._is_working:
+            self._sign_up_threads()
             self._execute_requests()
 
             if tick_timer % DataBase._commit_ticks == 0:
@@ -100,6 +136,7 @@ class DataBase(Thread):
     def _save_and_close(self):
         self._execute_requests()
         self.connection.commit()
+        print('Database committed. Ending operations...')
         self.connection.close()
 
     def __del__(self):

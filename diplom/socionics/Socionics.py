@@ -1,10 +1,13 @@
 class Psychotype:
-    psycho = 0
-    name = ''
+    psycho = int
+    name = str
 
-    def __init__(self, psycho, name):
+    def __init__(self, psycho: int, name: str = None):
         self.psycho = psycho
-        self.name = name
+        if name:
+            self.name = name
+        else:
+            self.find_name()
 
     @staticmethod
     def get_name(gr, i):
@@ -45,15 +48,21 @@ class Psychotype:
         }
         return Psychotype(names[name], name)
 
+    def find_name(self):
+        self.name = Psychotype.get_names()[self.psycho-1]
+
     def __getitem__(self, item: str):
         return self.get_by_name(item)
 
+    def __str__(self):
+        return self.name
+
 
 class Relation:
-    relation = 0
-    name = ''
+    relation = int
+    name = str
 
-    def __init__(self, relation, name):
+    def __init__(self, relation: int, name: str):
         self.relation = relation
         self.name = name
 
@@ -95,3 +104,6 @@ class Relation:
             'RO': 16
         }
         return Relation(relation[name], name)
+
+    def __str__(self):
+        return self.name

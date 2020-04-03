@@ -30,15 +30,19 @@ class Calculator:
         return self.psycho_table[item[0].psycho-1][item[1].psycho-1]
 
     def get_collective(self, collective: tuple, grades: tuple):
-        psychos = []
-        for i, num in zip(range(1, 17), collective):
-            if num == 0:
-                continue
-            for _ in range(num):
-                psychos.append(Psychotype(i, None))
+        psychos = Calculator.get_psychotypes_from_vector(collective)
         res = [[0]*len(psychos) for _ in psychos]
         for i, psycho in enumerate(psychos):
             for j, other in enumerate(psychos):
                 res[i][j] = grades[self[psycho, other].relation-1]
         return res
 
+    @staticmethod
+    def get_psychotypes_from_vector(vector: tuple):
+        psychos = []
+        for i, num in zip(range(1, 17), vector):
+            if num == 0:
+                continue
+            for _ in range(num):
+                psychos.append(Psychotype(i))
+        return psychos
