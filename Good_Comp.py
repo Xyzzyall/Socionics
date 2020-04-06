@@ -4,18 +4,18 @@ import numpy as np
 
 
 pType = Soc.Psychotype.get_names()
-# file = open('New_Psychotypes.txt', 'w')
-#
-# for i in range(16):
-#     mtxA = Comp.CompToFour.get(pType[i]).__data__
-#
-#     print(mtxA)
-#     s = str(mtxA)
-#     file.write(pType[i] + '\n')
-#     for index in s:
-#         file.write(index)
-#     file.write('\n')
-# file.close()
+file = open('Psychotypes_4X4.txt', 'w')
+
+for i in range(16):
+    mtxA = Comp.CompToFour.get(pType[i]).__data__
+
+    print(mtxA)
+    s = str(mtxA)
+    file.write(pType[i] + '\n')
+    for index in s:
+        file.write(index)
+    file.write('\n')
+file.close()
 
 # a = {}
 # for i in range(16):
@@ -60,15 +60,3 @@ for i in range(16):
     #print(mas)
 print(case)
 print(compare)
-
-file = open('compare.txt', 'w')
-compare = str(compare)
-for i in compare:
-    file.write(i)
-l = []
-file.close()
-f = open('compare.txt')
-for i in f:
-    l.append(f.read())
-f.close()
-print(l)

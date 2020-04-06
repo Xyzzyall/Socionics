@@ -6,21 +6,20 @@ from itertools import permutations
 
 def perch(i, tup, number):
     pType = Soc.Psychotype.get_names()
-    a = Comp.CompToFour.get(pType[tup]).__data__
+    a = Comp.CompToFour.get(pType[tup]).__data__  # чтение исходной матрицы 4X4
     m = np.array(a)
-
     # m = m[i]
     # m = m.transpose()
     # m = m[j]
     # m = m.transpose()
     # m = m[h]
     # m = m.transpose()
-    m = m[np.ix_(i, i)]
+    m = m[np.ix_(i, i)]  # применяет перестановку i одновременно на строки и столбцы
 
     mtxRes = np.zeros((2, 2), dtype=np.complex)
     change = [[0, 0, 0, 0], [0, 1, 1, 0], [1, 0, 0, 1], [-1, 0, 0, -1], [0, -1, -1, 0]]
 
-    def cases(x):
+    def cases(x):  # Функция замены содержимого матриц
         m = 0
         if x == change[1]:
             m = 1j
@@ -50,18 +49,26 @@ def perch(i, tup, number):
         print(number)
         print(mtxRes)
         print(i, '\n')
-        #print(j)
-        #print(h, '\n')
+        # print(j)
+        # print(h, '\n')
     return mtxRes
 
 
-#perch([3, 1, 2, 0], 0)
+# perch([3, 1, 2, 0], 0)
 
 k = 0
 for i in permutations([0, 1, 2, 3]):
     k += 1
     i = list(i)
-    #j = list(j)
-    #h = list(h)
+    # j = list(j)
+    # h = list(h)
     perch(i, 0, k)
-# For New Commit
+
+g = Comp.CompToFour.get('Np').__data__
+h = Comp.CompToFour.get('Np').__data__
+t = np.zeros((4, 4), dtype=np.int)
+print(g)
+print(h)
+g = g.transpose()
+np.matmul(h, g, t)
+print(t)
