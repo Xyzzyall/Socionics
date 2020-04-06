@@ -1,0 +1,4 @@
+{'collective': 4, 'grades': [<Sociometrica.SocionicsGrades.Grades object at 0x07168A10>]}(0, {'balanced':1632, '1 block':560, '2 blocks':1072, '3 blocks':204, 'non balanced':2040}
+
+
+
