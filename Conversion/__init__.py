@@ -1,4 +1,0 @@
-from Conversion.Conversion import ConversionPsychotype
-from Conversion.Conversion import ConversionRelation
-from Conversion.Conversion import ConversionPsychotype2
-from Conversion.Conversion import ConversionPsychotype3
