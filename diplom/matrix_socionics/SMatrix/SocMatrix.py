@@ -1,5 +1,5 @@
 import numpy as np
-import Good_4x4_Comp.Ptypes as Ptype
+import diplom.matrix_socionics.SMatrix.Ptypes as Ptype
 
 
 class SMatrix:

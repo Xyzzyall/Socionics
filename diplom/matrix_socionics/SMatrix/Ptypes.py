@@ -1,4 +1,4 @@
-import Good_4x4_Comp.SocMatrix as SM
+import diplom.matrix_socionics.SMatrix.SocMatrix as SM
 
 
 class Ptype(SM.SMatrix):
