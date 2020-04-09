@@ -63,4 +63,34 @@ class SMatrix:
             mtx[0][1] = cases(o)
             mtx[1][0] = cases(p)
             mtx[1][1] = cases(l)
+
+        return mtx
+
+    @staticmethod
+    def for_complex_type_search_units_and_zeros(tup, i, j):
+        psy = Ptype.Ptype.get_names()
+        m = Ptype.Ptype.get(psy[tup]).__data__     # чтение исходной матрицы 4X4
+        i = list(i)
+        j = list(j)
+        m = m[i]                                   # применение перестановки i на строки и перестановки J  на столбцы
+        m = m.transpose()
+        m = m[j]
+        m = m.transpose()
+
+        mtx = np.zeros((4, 4), dtype=np.int)
+        change = [[0, 0, 0, 0], [1, 0, 0, -1], [-1, 0, 0, 1], [0, 1, -1, 0], [0, -1, 1, 0]]
+
+        u = [m[0][0], m[0][1], m[1][0], m[1][1]]
+        o = [m[0][2], m[0][3], m[1][2], m[1][3]]
+        p = [m[2][0], m[2][1], m[3][0], m[3][1]]
+        l = [m[2][2], m[2][3], m[3][2], m[3][3]]
+
+        t1 = u in change
+        t2 = o in change
+        t3 = p in change
+        t4 = l in change
+
+        if t1 and t2 and t3 and t4:
+            mtx = m
+
         return mtx
