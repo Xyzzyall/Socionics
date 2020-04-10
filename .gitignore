@@ -1,2 +1,3 @@
-/.idea/
+.idea/
 /venv/
+/results/balance_results/results.sqlite
