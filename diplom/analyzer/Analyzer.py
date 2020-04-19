@@ -104,11 +104,12 @@ class Analyzer(Thread):
                 inds = Balance.balance(np.array(graded_collective))
                 balanced_coll = np.array(graded_collective)[np.ix_(inds, inds)]
                 res = Balance.check_blocks(np.array(balanced_coll))
-                yield res[0], res[1], inds, Calculator.get_psychotypes_from_vector(gr)
+                yield graded_collective, res[0], res[1], inds, Calculator.get_psychotypes_from_vector(gr)
 
         groups_to_append = []
 
-        for blocked, clasters, inds, group in group_balanced():
+        for collective, blocked, clasters, inds, group in group_balanced():
+            # считаю баланс в коллективе
             if blocked:
                 n = len(clasters)
                 if n == 1:
@@ -128,9 +129,10 @@ class Analyzer(Thread):
                     groups_to_append = []
             else:
                 non_balanced += 1
+
+            # подсчет циклов
+
             iterations += 1
-            # if iterations % 100 == 0:
-            #     print(str(iterations) + ' is done.')
 
         if len(groups_to_append) > 0:
             self.database.append_request(RequestMany(
@@ -146,13 +148,4 @@ class Analyzer(Thread):
 
         self.database.sign_out_thread()
         print(f'Thread {self.name} finished working. Done {iterations} iterations.')
-        # balanced = balanced_1b + balanced_2b
-        # out.write(", 'balanced':" + str(balanced) + ", '1 block':" + str(balanced_1b) + ", '2 blocks':" + \
-        #        str(balanced_2b) + ", '3 blocks':" + str(balanced_3b) + ", 'non balanced':" + str(non_balanced) + "}")
-        # grade_i += 1
 
-        # print('Grade ' + str(grade_i) + ' analyzed.')
-        # out.close()
-        # print(
-        #  'Analysis is done. Performed ' + str(iterations) + ' iterations, analyzed ' + str(grade_i + 1) + ' grades.')
-        # todo: delete...

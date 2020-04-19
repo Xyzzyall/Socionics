@@ -1,5 +1,6 @@
 from diplom.socionics import Relation
 from diplom.socionics import Psychotype
+import networkx as netx
 
 
 class Calculator:
@@ -46,3 +47,18 @@ class Calculator:
             for _ in range(num):
                 psychos.append(Psychotype(i))
         return psychos
+
+    @staticmethod
+    def matrix_to_graph(m_graph: list, changes: dict, diag_to_null: bool = True):
+        matrix = m_graph.copy()
+        if diag_to_null:
+            for x in range(len(matrix)):
+                matrix[x][x] = 0
+
+        connections = []
+        for x, row in enumerate(matrix):
+            for y, edge in enumerate(row):
+                edge_changed = changes[edge]
+                if edge_changed == 1:
+                    connections.append((x, y))
+        return netx.DiGraph(connections)
