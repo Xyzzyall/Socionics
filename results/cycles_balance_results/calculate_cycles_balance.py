@@ -42,14 +42,16 @@ CREATE TABLE collective(
     name TEXT,
     blocks INTEGER,
     perms TEXT,
+    positive_cycles INTEGER,
+    negative_cycles INTEGER,
+    all_cycles INTEGER,
     FOREIGN KEY(grade_stats_id) REFERENCES grade_stats(rowid)
 )
 """
 
-# Не работает. Т.к. изменилась структура запросов на добавление данных коллектива в аналайзере.
 
 def run_db():
-    db = DataBase('results/balance_results/results.sqlite', database_tables)
+    db = DataBase('results.sqlite', database_tables)
     db.start()
     return db
 
@@ -63,16 +65,23 @@ class Analysis(Thread):
 
     def run(self) -> None:
         def grades_generator():
-            for grade in product([1, 0, -1], repeat=5):
-                yield (1, 1, 1, 1, -1, 1, 1, grade[0], -1, grade[1], grade[2], grade[3], -1, -1, grade[4], -1)
+            # for grade in product([1, 0, -1], repeat=5):
+            #     yield (1, 1, 1, 1, -1, 1, 1, grade[0], -1, grade[1], grade[2], grade[3], -1, -1, grade[4], -1)
+            return 1, 1, 1, 1, -1, 1, 1, 0, -1, 0, 0, 0, -1, -1, 0, -1
 
         collective_size = 4
 
-        for i, grade in enumerate(grades_generator()):
+        """for i, grade in enumerate(grades_generator()):
             task = AnalyzerTask(collective_size, grade)
             analyzer = Analyzer(task, f'num{i}', self.db)
             analyzer.start()
             analyzer.join()
+        """
+        i = 0
+        task = AnalyzerTask(collective_size, (1, 1, 1, 1, -1, 1, 1, 0, -1, 0, 0, 0, -1, -1, 0, -1))
+        analyzer = Analyzer(task, f'num{i}', self.db)
+        analyzer.start()
+        analyzer.join()
 
 
 db = run_db()

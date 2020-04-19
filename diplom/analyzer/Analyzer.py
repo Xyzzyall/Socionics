@@ -6,6 +6,7 @@ from diplom.socionics import Calculator
 from diplom.database.DataBase import Request
 from diplom.database.DataBase import RequestMany
 import time
+import networkx as netx
 
 # todo: delete this
 import numpy as np
@@ -39,9 +40,10 @@ class Analyzer(Thread):
     );
     SELECT COUNT(rowid) FROM grade_stats
     """
+
     _db_request_insert_many_groups = """
     INSERT INTO collective VALUES(
-        null,?,?,?,?
+        null,?,?,?,?, ?,?,?
     )
     """
     _db_request_max_groups_to_send = 500
@@ -109,8 +111,9 @@ class Analyzer(Thread):
         groups_to_append = []
 
         for collective, blocked, clasters, inds, group in group_balanced():
-            # считаю баланс в коллективе
+            n = 0
             if blocked:
+                # считаю баланс в коллективе
                 n = len(clasters)
                 if n == 1:
                     balanced_1b += 1
@@ -120,17 +123,30 @@ class Analyzer(Thread):
                     balanced_3b += 1
                 else:
                     balanced_other += 1
-                groups_to_append.append((grade_stats_rowid, str([str(psycho) for psycho in group]), n, str(inds)))
-                if len(groups_to_append) > Analyzer._db_request_max_groups_to_send:
-                    self.database.append_request(RequestMany(
-                        Analyzer._db_request_insert_many_groups,
-                        groups_to_append
-                    ))
-                    groups_to_append = []
             else:
                 non_balanced += 1
 
             # подсчет циклов
+            gr_all = self.soc_calc.matrix_to_graph(collective, {-1: 1, 1: 1, 0: 0})
+            gr_pos = self.soc_calc.matrix_to_graph(collective, {-1: 0, 1: 1, 0: 0})
+            gr_neg = self.soc_calc.matrix_to_graph(collective, {-1: 1, 1: 0, 0: 0})
+
+            groups_to_append.append((
+                grade_stats_rowid,
+                str([str(psycho) for psycho in group]),
+                n,
+                str(inds),
+                len(list(netx.simple_cycles(gr_pos))),  # тут и ниже идет подсчет простых циклов в графах с разными заменами
+                len(list(netx.simple_cycles(gr_neg))),
+                len(list(netx.simple_cycles(gr_all)))
+            ))
+
+            if len(groups_to_append) > Analyzer._db_request_max_groups_to_send:
+                self.database.append_request(RequestMany(
+                    Analyzer._db_request_insert_many_groups,
+                    groups_to_append
+                ))
+                groups_to_append = []
 
             iterations += 1
 
