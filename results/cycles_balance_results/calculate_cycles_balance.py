@@ -78,7 +78,7 @@ class Analysis(Thread):
             analyzer.join()
         """
         i = 0
-        task = AnalyzerTask(collective_size, (1, 1, 1, 1, -1, 1, 1, 0, -1, 0, 0, 0, -1, -1, 0, -1))
+        task = AnalyzerTask(collective_size, (1, 1, 1, 1,   -1, -1, 0, 0,    0, 0, 0, -1,   -1, -1, 0, 0))
         analyzer = Analyzer(task, f'num{i}', self.db)
         analyzer.start()
         analyzer.join()
@@ -88,3 +88,4 @@ db = run_db()
 analysis = Analysis(db)
 analysis.start()
 analysis.join()
+db.close()

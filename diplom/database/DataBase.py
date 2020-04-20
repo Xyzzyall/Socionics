@@ -56,6 +56,8 @@ class DataBase(Thread):
 
     _is_working = bool
 
+    _is_a_lib = bool
+
     def __init__(self, db_file: str, create_tables_request: str):
         Thread.__init__(self, name='DataBase')
         self.queue = {}
@@ -64,6 +66,17 @@ class DataBase(Thread):
         self._is_working = False
         self._db_file = db_file
         self._tables_req = create_tables_request
+        self._is_a_lib = False
+
+    @staticmethod
+    def database_as_wrapper(db_file: str, create_tables_request: str):
+        db = DataBase(db_file, create_tables_request)
+        db._is_a_lib = True
+        db._initialize()
+        return db
+
+    def wrp_execute_request(self, request: Request):
+        request.execute(self.cursor)
 
     def sign_up_thread(self):
         assert (current_thread() not in self.queue), "Thread already signed"
@@ -106,7 +119,7 @@ class DataBase(Thread):
                 except sqlite.DatabaseError:
                     print('Something wrong with request: ' + str(req))
 
-    def run(self) -> None:
+    def _initialize(self):
         try:
             with open(self._db_file, 'r'):
                 self.connection = sqlite.connect(self._db_file)
@@ -117,6 +130,13 @@ class DataBase(Thread):
             for req in self._tables_req.split(';'):
                 self.cursor.execute(req)
             self.connection.commit()
+        except Exception:
+            raise Exception(f"Maybe I can't get an access to directory '{self._db_file}' or it does not exist? Who knows.")
+
+    def run(self) -> None:
+        if self._is_a_lib:
+            raise Exception('This thread is prohibited to run. Use default __init__ statement.')
+        self._initialize()
 
         self._is_working = True
         tick_timer = 0
