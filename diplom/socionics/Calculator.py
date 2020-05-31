@@ -1,7 +1,7 @@
 from diplom.socionics import Relation
 from diplom.socionics import Psychotype
 import networkx as netx
-
+from collections import defaultdict
 
 class Calculator:
     psycho_table = list
@@ -49,16 +49,49 @@ class Calculator:
         return psychos
 
     @staticmethod
-    def matrix_to_graph(m_graph: list, changes: dict, diag_to_null: bool = True):
+    def matrix_to_graph(m_graph: list, changes: dict = None, diag_to_null: bool = True):
         matrix = m_graph.copy()
         if diag_to_null:
             for x in range(len(matrix)):
                 matrix[x][x] = 0
 
         connections = []
+        res = netx.DiGraph()
         for x, row in enumerate(matrix):
             for y, edge in enumerate(row):
-                edge_changed = changes[edge]
-                if edge_changed == 1:
-                    connections.append((x, y))
-        return netx.DiGraph(connections)
+                if changes:
+                    edge_changed = changes[edge]
+                    if edge_changed == 1:
+                        connections.append((x, y))
+                else:
+                    if edge:
+                        connections.append((x, y, edge))
+
+            if changes:
+                res.add_edges_from(connections)
+            else:
+                res.add_weighted_edges_from(connections)
+
+        return res
+
+    @staticmethod
+    def cycles_in_signed_graph(graph: netx.DiGraph):
+        for cycle in netx.simple_cycles(graph):
+            if len(cycle) < 3:
+                continue
+            sign = 1
+            for edge0, edge1 in ((cycle[j-1], cycle[j]) for j in range(1, len(cycle))):
+                sign *= graph[edge0][edge1]['weight']
+            sign *= graph[cycle[-1]][cycle[0]]['weight']
+            yield sign, cycle
+
+    @staticmethod
+    def count_cycles_in_signed_graph(graph: netx.DiGraph):
+        pos_cycles = defaultdict(int)
+        neg_cycles = defaultdict(int)
+        for sign, cycle in Calculator.cycles_in_signed_graph(graph):
+            if sign > 0:
+                pos_cycles[len(cycle)] += 1
+            else:
+                neg_cycles[len(cycle)] += 1
+        return pos_cycles, neg_cycles
