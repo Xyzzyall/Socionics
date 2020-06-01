@@ -2,3 +2,4 @@
 /venv/
 /results/balance_results/results.sqlite
 /results/cycles_balance_results/results.sqlite
+/results/proper_cycle_balance/results.sqlite

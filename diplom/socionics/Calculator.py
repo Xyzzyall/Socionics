@@ -89,6 +89,9 @@ class Calculator:
     def count_cycles_in_signed_graph(graph: netx.DiGraph):
         pos_cycles = defaultdict(int)
         neg_cycles = defaultdict(int)
+        pos_cycles[3] = 0
+        neg_cycles[3] = 0
+
         for sign, cycle in Calculator.cycles_in_signed_graph(graph):
             if sign > 0:
                 pos_cycles[len(cycle)] += 1

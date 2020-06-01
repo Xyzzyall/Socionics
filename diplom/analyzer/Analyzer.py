@@ -21,8 +21,6 @@ class AnalyzerTask:
         self.grade = grade
 
 
-# todo: расспросить куренкова про функцию баланса. нужна быстрая функция без перестановок.
-
 class Analyzer(Thread):
     task = AnalyzerTask
     database = DataBase
@@ -36,14 +34,14 @@ class Analyzer(Thread):
     """
     _db_request_insert_grade_stats = """
     INSERT INTO grade_stats VALUES(
-        null, %s, %s, %s, %s, %s, %s, %s
+        null, %s, %s
     );
     SELECT COUNT(rowid) FROM grade_stats
     """
 
     _db_request_insert_many_groups = """
     INSERT INTO collective VALUES(
-        null,?,?,?,?, ?,?,?
+        null,?,?, ?,?
     )
     """
     _db_request_max_groups_to_send = 500
@@ -67,16 +65,7 @@ class Analyzer(Thread):
     def run(self) -> None:
         # todo: delete this
         iterations = 0
-        # out = open('test.txt', 'a')
-        # grade_i = 0
         grade = self.task.grade
-
-        # out.write("\n{'collective': " + str('dik') + ", 'grades': '" + str(grade) + "'")
-        balanced_1b = 0
-        balanced_2b = 0
-        balanced_3b = 0
-        balanced_other = 0
-        non_balanced = 0
 
         # добавление начальных значений в бд, получение индексов в таблицах
         self.database.sign_up_thread()
@@ -92,7 +81,7 @@ class Analyzer(Thread):
 
         grade_stats_rowid = []
         self.database.append_request(Request(
-            Analyzer._db_request_insert_grade_stats % (grade_rowid, self.task.collective.size, 0, 0, 0, 0, 0),
+            Analyzer._db_request_insert_grade_stats % (grade_rowid, self.task.collective.size),
             lambda rowid: grade_stats_rowid.append(rowid)
         ))
         while len(grade_stats_rowid) == 0:
@@ -100,45 +89,21 @@ class Analyzer(Thread):
         grade_stats_rowid = grade_stats_rowid[0][0][0]-1
         print(f'Thread {self.name} appended to DB.')
 
-        def group_balanced():
-            for gr in self.task.collective:
-                graded_collective = self.soc_calc.get_collective(gr, grade)
-                inds = Balance.balance(np.array(graded_collective))
-                balanced_coll = np.array(graded_collective)[np.ix_(inds, inds)]
-                res = Balance.check_blocks(np.array(balanced_coll))
-                yield graded_collective, res[0], res[1], inds, Calculator.get_psychotypes_from_vector(gr)
+        def group_analysis(group: tuple):
+            signed_graph = self.soc_calc.matrix_to_graph(self.soc_calc.get_collective(group, self.task.grade))
+            # there may be a little optimization...
+            return self.soc_calc.balance(signed_graph), self.soc_calc.balance_length_weighted(signed_graph)
 
         groups_to_append = []
 
-        for collective, blocked, clasters, inds, group in group_balanced():
-            n = 0
-            if blocked:
-                # считаю баланс в коллективе
-                n = len(clasters)
-                if n == 1:
-                    balanced_1b += 1
-                elif n == 2:
-                    balanced_2b += 1
-                elif n == 3:
-                    balanced_3b += 1
-                else:
-                    balanced_other += 1
-            else:
-                non_balanced += 1
-
-            # подсчет циклов
-            gr_all = self.soc_calc.matrix_to_graph(collective, {-1: 1, 1: 1, 0: 0})
-            gr_pos = self.soc_calc.matrix_to_graph(collective, {-1: 0, 1: 1, 0: 0})
-            gr_neg = self.soc_calc.matrix_to_graph(collective, {-1: 1, 1: 0, 0: 0})
+        for group in self.task.collective:
+            balance, balance_len_weighted = group_analysis(group)
 
             groups_to_append.append((
                 grade_stats_rowid,
                 str([str(psycho) for psycho in group]),
-                n,
-                str(inds),
-                len(list(netx.simple_cycles(gr_pos))),  # тут и ниже идет подсчет простых циклов в графах с разными заменами
-                len(list(netx.simple_cycles(gr_neg))),
-                len(list(netx.simple_cycles(gr_all)))
+                balance,
+                balance_len_weighted
             ))
 
             if len(groups_to_append) > Analyzer._db_request_max_groups_to_send:
@@ -156,11 +121,11 @@ class Analyzer(Thread):
                 groups_to_append
             ))
 
-        self.database.append_request(Request(
-            Analyzer._db_request_update_grade_stats % (
-                non_balanced, balanced_1b, balanced_2b, balanced_3b, balanced_other, grade_stats_rowid
-            )
-        ))
+        # self.database.append_request(Request(
+        #     Analyzer._db_request_update_grade_stats % (
+        #         _, grade_stats_rowid
+        #     )
+        # ))
 
         self.database.sign_out_thread()
         print(f'Thread {self.name} finished working. Done {iterations} iterations.')
