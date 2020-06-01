@@ -95,3 +95,28 @@ class Calculator:
             else:
                 neg_cycles[len(cycle)] += 1
         return pos_cycles, neg_cycles
+
+    @staticmethod
+    def balance(graph: netx.DiGraph):
+        pos_cycles, neg_cycles = Calculator.count_cycles_in_signed_graph(graph)
+        num_of_pos_cycles, num_of_neg_cycles = sum(pos_cycles.values()), sum(neg_cycles.values())
+        num_of_cycles = num_of_pos_cycles + num_of_neg_cycles
+        if num_of_cycles == 0:
+            return 0.0
+        else:
+            return num_of_pos_cycles / num_of_cycles
+
+    @staticmethod
+    def balance_length_weighted(graph: netx.DiGraph):
+        pos_cycles, neg_cycles = Calculator.count_cycles_in_signed_graph(graph)
+        n = max(max(pos_cycles.keys()), max(neg_cycles.keys()))     # finding length of the longest cycle
+        a, b = 0, 0  # b_l(G) = a / b
+        for i in range(3, n+1):
+            num_of_cycles = pos_cycles[i] + neg_cycles[i]
+            a += pos_cycles[i] / i
+            b += num_of_cycles / i
+
+        if b == 0:
+            return 0.0
+        else:
+            return a / b
