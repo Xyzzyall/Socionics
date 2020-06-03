@@ -2,14 +2,53 @@ from matplotlib import pyplot as plt
 from diplom.database import DataBase
 from diplom.database.DataBase import Request
 import numpy as np
+from threading import Thread
 
 
-get_collectives_request = """
+class Visualizer(Thread):
+    STAT_DOTS = 1000
+
+    db = DataBase
+
+    def __init__(self, db_file: str):
+        Thread.__init__(self, name='Visualizer')
+        self.db = DataBase(db_file, "I'm empty...")
+        self.db.start()
+        self.db.sign_up_thread(self)
+
+    def plot_balance_stat(self, grade_stats_id: int, axes: plt.Axes, normalize: bool = False,
+                          field_name: str = 'balance', **plot_props):
+        get_collectives_balance_req = f"""
+            SELECT {field_name} FROM collective
+            WHERE grade_stats_id = {grade_stats_id}
+        """
+        dots = [0.0]*(Visualizer.STAT_DOTS + 1)
+        for group in self.db.execute_request(get_collectives_balance_req):
+            dots[int(group[0]*Visualizer.STAT_DOTS)] += 1
+
+        if normalize:
+            Visualizer.min_max_normalize(dots)
+
+        x_axis = (x/Visualizer.STAT_DOTS for x in range(Visualizer.STAT_DOTS+1))
+        axes.plot(x_axis, dots, plot_props)
+
+    @staticmethod
+    def min_max_normalize(arr: list, mn: int = None, mx: int = None):
+        mn = mn if mn else min(arr)
+        mx = mx if mx else max(arr)
+        for i, val in enumerate(arr):
+            arr[i] = (val - mn) / (mx - mn)
+
+    def __del__(self):
+        self.db.close()
+
+
+old_get_collectives_request = """
 SELECT blocks, all_cycles, positive_cycles, negative_cycles FROM collective
 """
 
 
-def draw_cycles_stat(db_file: str, blocks_cutoff: set = None):
+def old_draw_cycles_stat(db_file: str, blocks_cutoff: set = None):
     def normalize(arr: list, mn: int = None, mx: int = None):
         mn = mn if mn else min(arr)
         mx = mx if mx else max(arr)
@@ -19,7 +58,7 @@ def draw_cycles_stat(db_file: str, blocks_cutoff: set = None):
     db = DataBase.database_as_wrapper(db_file, 'kill me softly')
 
     data = []
-    db.wrp_execute_request(Request(get_collectives_request, lambda d: data.append(d)))
+    db.wrp_execute_request(Request(old_get_collectives_request, lambda d: data.append(d)))
     data = data[0]
 
     # getting stats
@@ -57,11 +96,11 @@ def draw_cycles_stat(db_file: str, blocks_cutoff: set = None):
     plt.show()
 
 
-def draw_balance_to_cycles(db_file: str):
+def old_draw_balance_to_cycles(db_file: str):
     db = DataBase.database_as_wrapper(db_file, 'kill me softly')
 
     data = []
-    db.wrp_execute_request(Request(get_collectives_request, lambda d: data.append(d)))
+    db.wrp_execute_request(Request(old_get_collectives_request, lambda d: data.append(d)))
     data = data[0]
 
     pos_stats = list(range(5))
