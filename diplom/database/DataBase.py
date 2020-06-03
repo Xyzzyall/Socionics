@@ -78,9 +78,11 @@ class DataBase(Thread):
     def wrp_execute_request(self, request: Request):
         request.execute(self.cursor)
 
-    def sign_up_thread(self):
-        assert (current_thread() not in self.queue), "Thread already signed"
-        self.to_sign_up.append(current_thread())
+    def sign_up_thread(self, thread: Thread = None):
+        if not thread:
+            thread = current_thread()
+        assert (thread not in self.queue), "Thread already signed"
+        self.to_sign_up.append(thread)
 
     def sign_out_thread(self):
         self.to_sign_out.append(current_thread())
@@ -106,6 +108,14 @@ class DataBase(Thread):
         while (current_thread() not in self.queue) and (current_thread() in self.to_sign_up):
             time.sleep(0.01)
         self.queue[current_thread()].append(request)
+
+    def execute_request(self, str_request: str):
+        done = []
+        request = Request(str_request, response_wrapper=(lambda data: done.append(data)))
+        self.append_request(request)
+        while len(done) != 1:
+            time.sleep(0.001)
+        return done[0]
 
     def close(self):
         self._is_working = False
