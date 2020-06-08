@@ -114,6 +114,8 @@ class Analyzer(Thread):
                 groups_to_append = []
 
             iterations += 1
+            if iterations % 100 == 0:
+                print(f'done {iterations} iterations!')
 
         if len(groups_to_append) > 0:
             self.database.append_request(RequestMany(

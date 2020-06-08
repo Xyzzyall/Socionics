@@ -6,7 +6,7 @@ from threading import Thread
 
 
 class Visualizer(Thread):
-    STAT_DOTS = 1000
+    STAT_DOTS = 200
 
     db = DataBase
 
@@ -29,8 +29,15 @@ class Visualizer(Thread):
         if normalize:
             Visualizer.min_max_normalize(dots)
 
-        x_axis = (x/Visualizer.STAT_DOTS for x in range(Visualizer.STAT_DOTS+1))
-        axes.plot(x_axis, dots, plot_props)
+        x_axis = [x/Visualizer.STAT_DOTS for x in range(Visualizer.STAT_DOTS+1)]
+        print(list(zip(x_axis, dots)))
+        axes.plot(x_axis, dots, **plot_props)
+
+    def run(self) -> None:
+        if self.is_alive():
+            self.db.sign_up_thread(self)
+        else:
+            self.db.sign_up_thread()
 
     @staticmethod
     def min_max_normalize(arr: list, mn: int = None, mx: int = None):
@@ -82,7 +89,6 @@ def old_draw_cycles_stat(db_file: str, blocks_cutoff: set = None):
     mn = min(min(pos_stats), min(neg_stats))
     normalize(pos_stats, mn, mx)
     normalize(neg_stats, mn, mx)
-
 
     fig, axs = plt.subplots(1, 1, figsize=(9, 3))
     line1 = axs.plot(range(31), pos_stats, label='Положительные циклы')

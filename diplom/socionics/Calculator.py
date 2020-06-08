@@ -39,6 +39,20 @@ class Calculator:
         return res
 
     @staticmethod
+    def get_quadras_in_group(group: tuple) -> tuple:
+        quadras = [0, 0, 0, 0]
+        for typ, num in enumerate(group):
+            if typ in range(0, 4):
+                quadras[0] += num
+            elif typ in range(4, 8):
+                quadras[1] += num
+            elif typ in range(8, 12):
+                quadras[2] += num
+            else:
+                quadras[3] += num
+        return tuple(quadras)
+
+    @staticmethod
     def get_psychotypes_from_vector(vector: tuple):
         psychos = []
         for i, num in zip(range(1, 17), vector):
