@@ -59,7 +59,7 @@ class Analysis(Thread):
         collective_size = 6
 
         i = 0
-        task = AnalyzerTask(collective_size, (1, 1, 1, 1,   -1, -1, 0, 0,    0, 0, 0, -1,   -1, -1, 0, 0))
+        task = AnalyzerTask(collective_size, (1, 1, 1, 1,   -1, -1, 0, 0,    0, 0, 0, -1,   -1, -1, 1, 0))
         analyzer = Analyzer(task, f'num{i}', self.db)
         analyzer.start()
         analyzer.join()

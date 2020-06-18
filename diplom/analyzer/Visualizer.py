@@ -6,7 +6,7 @@ from threading import Thread
 
 
 class Visualizer(Thread):
-    STAT_DOTS = 200
+    STAT_DOTS = 100
 
     db = DataBase
 
@@ -17,21 +17,25 @@ class Visualizer(Thread):
         self.db.sign_up_thread(self)
 
     def plot_balance_stat(self, grade_stats_id: int, axes: plt.Axes, normalize: bool = False,
-                          field_name: str = 'balance', **plot_props):
+                          field_name: str = 'balance', hist_shift=0, **plot_props):
         get_collectives_balance_req = f"""
             SELECT {field_name} FROM collective
             WHERE grade_stats_id = {grade_stats_id}
         """
-        dots = [0.0]*(Visualizer.STAT_DOTS + 1)
-        for group in self.db.execute_request(get_collectives_balance_req):
-            dots[int(group[0]*Visualizer.STAT_DOTS)] += 1
+        # dots = [0.0]*(Visualizer.STAT_DOTS + 1)
+        # for group in self.db.execute_request(get_collectives_balance_req):
+        #     dots[int(group[0]*Visualizer.STAT_DOTS)] += 1
+        #
+        # if normalize:
+        #     Visualizer.min_max_normalize(dots)
+        #
+        # x_axis = [x/Visualizer.STAT_DOTS for x in range(Visualizer.STAT_DOTS+1)]
+        # print(list(zip(x_axis, dots)))
+        # axes.plot(x_axis, dots, **plot_props)
 
-        if normalize:
-            Visualizer.min_max_normalize(dots)
-
-        x_axis = [x/Visualizer.STAT_DOTS for x in range(Visualizer.STAT_DOTS+1)]
-        print(list(zip(x_axis, dots)))
-        axes.plot(x_axis, dots, **plot_props)
+        x_axis = [x / Visualizer.STAT_DOTS + hist_shift for x in range(Visualizer.STAT_DOTS + 1)]
+        groups = np.histogram(self.db.execute_request(get_collectives_balance_req), bins=Visualizer.STAT_DOTS+1)[0]
+        axes.bar(x=x_axis, height=groups, width=1/Visualizer.STAT_DOTS, **plot_props)
 
     def run(self) -> None:
         if self.is_alive():
