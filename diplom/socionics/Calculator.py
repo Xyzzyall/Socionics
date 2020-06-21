@@ -39,6 +39,12 @@ class Calculator:
         return res
 
     @staticmethod
+    def name_of_group_to_tuple(name: str) -> tuple:
+        """note: does not work for groups those have more than 9 members"""
+        cut = '0123456789'
+        return tuple(int(s) for s in filter(lambda s: s in cut, name))
+
+    @staticmethod
     def get_quadras_in_group(group: tuple) -> tuple:
         quadras = [0, 0, 0, 0]
         for typ, num in enumerate(group):

@@ -3,6 +3,7 @@ from diplom.database import DataBase
 from diplom.database.DataBase import Request
 import numpy as np
 from threading import Thread
+from diplom.socionics.Calculator import Calculator
 
 
 class Visualizer(Thread):
@@ -17,9 +18,9 @@ class Visualizer(Thread):
         self.db.sign_up_thread(self)
 
     def plot_balance_stat(self, grade_stats_id: int, axes: plt.Axes, normalize: bool = False,
-                          field_name: str = 'balance', hist_shift=0, **plot_props):
+                          socio_filter: callable = None, field_name: str = 'balance', hist_shift=0, **plot_props):
         get_collectives_balance_req = f"""
-            SELECT {field_name} FROM collective
+            SELECT name, {field_name} FROM collective
             WHERE grade_stats_id = {grade_stats_id}
         """
         # dots = [0.0]*(Visualizer.STAT_DOTS + 1)
@@ -33,8 +34,18 @@ class Visualizer(Thread):
         # print(list(zip(x_axis, dots)))
         # axes.plot(x_axis, dots, **plot_props)
 
+        data = self.db.execute_request(get_collectives_balance_req)
+        groups = []
+        for name, balance in data:
+            if socio_filter:
+                group = Calculator.name_of_group_to_tuple(name)
+                if socio_filter(group):
+                    groups.append(balance)
+            else:
+                groups.append(balance)
+
         x_axis = [x / Visualizer.STAT_DOTS + hist_shift for x in range(Visualizer.STAT_DOTS + 1)]
-        groups = np.histogram(self.db.execute_request(get_collectives_balance_req), bins=Visualizer.STAT_DOTS+1)[0]
+        groups = np.histogram(groups, bins=Visualizer.STAT_DOTS+1, range=(0, 1))[0]
         axes.bar(x=x_axis, height=groups, width=1/Visualizer.STAT_DOTS, **plot_props)
 
     def run(self) -> None:
